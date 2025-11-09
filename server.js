@@ -5,21 +5,28 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import productsRoute from "./rest/routes/products.js";
 import meRoute from "./rest/routes/me.route.js";
-dotenv.config();
+
+
 const app = express();
-const PORT = process.env.PORT || 8080;
-
-// Connect to MongoDB
-connectDB();
-
-// Middleware
 app.use(cors());
 app.use(express.json());
+
+dotenv.config();
+const PORT = process.env.PORT || 8080;
+const profile = express.static("public");
+connectDB();
 
 // Routes
 app.use("/me", meRoute);
 app.use("/api/products", productsRoute);
+app.use("/", profile);
 
+app.use((req, res) => {
+  res.status(404).send(`
+        <h2>Uh Oh!</h2>
+        <p>Sorry, ${req.url} cannot be found here</p>
+    `);
+});
 // Start the server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
