@@ -1,42 +1,26 @@
 import fs from "fs";
-import Product from "../server/model/products.js";
+import Me from "../common/models/me.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import { seedDatabase } from "../common/helpers/seedDatabase.js";
 
 // Load environment variables
 dotenv.config();
 
 const uri = process.env.MONGO_URI;
 
-// Load products.json
-const jsonPath = new URL("./server/data/products.json", import.meta.url);
-const products = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
-// Ensure every variant has size and price
-const sanitizedProducts = products.map((product) => {
-  const variants = product.variants.map((v, i) => ({
-    size: v.size || `Variant ${i + 1}`,
-    price: v.price ?? 0,
-  }));
-  return { ...product, variants };
-});
-const seedDatabase = async () => {
+const jsonPath = new URL("../common/data/me.json", import.meta.url);
+const me = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
+
+const submitData = async () => {
   try {
-    await mongoose.connect(uri, {
-      dbName: "storage",
-      serverApi: { version: "1", strict: true, deprecationErrors: true },
-      serverSelectionTimeoutMS: 5000,
-    });
-
     console.log("✅ Connected to MongoDB");
+    await seedDatabase(uri, data, me);
 
-    // Clear old data
-    await Product.deleteMany();
-    console.log("🧹 Cleared old data");
-
-    // Insert products
-    await Product.insertMany(sanitizedProducts);
+    // Insert data
+    await Me.insertMany(data);
     console.log(
-      `🌱 Inserted ${sanitizedProducts.length} product(s) successfully`
+      `🌱 Inserted data successfully`
     );
 
     await mongoose.disconnect();
@@ -47,4 +31,4 @@ const seedDatabase = async () => {
   }
 };
 
-seedDatabase();
+submitData();

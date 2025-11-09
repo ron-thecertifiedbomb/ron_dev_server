@@ -4,7 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import productsRoute from "./rest/routes/products.js";
-
+import meRoute from "./rest/routes/me.route.js";
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -17,6 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
+app.use("/me", meRoute);
 app.use("/api/products", productsRoute);
 
 // Start the server

@@ -1,5 +1,5 @@
 // productService.js
-import Product from "../models/products.js";
+import Product from "../models/products.schema.js";
 
 export const getAllProducts = async () => await Product.find();
 
