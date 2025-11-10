@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import Me from "../models/me.schema.js";
+
+
 export const seedDatabase = async ( data, database ) => {
   const URI = process.env.MONGO_URI;
 
