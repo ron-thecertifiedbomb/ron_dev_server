@@ -20,6 +20,19 @@ const educationSchema = new mongoose.Schema(
   { _id: false }
 );
 
+
+const personalSchema = new mongoose.Schema(
+  {
+    name: String,
+    title: String,
+    address: String,
+    location: String,
+    profilePhoto: String,
+    summary: String,
+    aboutMe: String,
+  },
+  { _id: false }
+);
 const contactSchema = new mongoose.Schema(
   {
     email: String,
@@ -35,12 +48,7 @@ const contactSchema = new mongoose.Schema(
 
 const meSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, trim: true },
-    title: { type: String, required: true, trim: true },
-    location: { type: String, required: true },
-    profilePhoto: { type: String, required: true },
-    summary: { type: String, default: "" },
-    aboutMe: { type: String, default: "" },
+    personal: personalSchema,
     contact: contactSchema,
     headlineTags: [String],
     skills: [String],
