@@ -16,6 +16,19 @@ export const fetchProducts = async (req, res) => {
   }
 };
 
+// GET all products banners
+export const fetchProductBanners = async (req, res) => {
+  try {
+    const products = await getAllProducts();
+    const banners = products.map((p) => p.image_url); 
+    res.status(200).json(banners);
+    console.log("all product banners", banners);
+  } catch (err) {
+    console.error("❌ Error fetching product banners:", err);
+    res.status(500).json({ message: "Server error fetching products" });
+  }
+};
+
 // GET product by ID
 export const fetchProduct = async (req, res) => {
   const { id } = req.params;
