@@ -20,7 +20,7 @@ class LegendHeader extends HTMLElement {
                 }
                 p {
                     font-size: 1.25rem;
-                    color: #666;
+                    color: #777676;
                 }
             </style>
             ${title ? `<h1>${title}</h1>` : ""}
