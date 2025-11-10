@@ -2,7 +2,7 @@ import fs from "fs";
 import Me from "../common/models/me.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import { seedDatabase } from "../common/helpers/seedDatabase.js";
+import { seedDatabase } from "../helpers/seedDatabase.js";
 
 // Load environment variables
 dotenv.config();
