@@ -3,6 +3,6 @@ import { meData } from "../controller/meController.js";
 const router = express.Router();
 
 // Routes
-router.get("/", meData);
+router.get("/profile", meData);
 
 export default router;
