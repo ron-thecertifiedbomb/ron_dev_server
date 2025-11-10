@@ -1,9 +1,8 @@
-// server.js
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
-import productsRoute from "./rest/routes/products.js";
+import productsRoute from "./rest/routes/products.route.js";
 import meRoute from "./rest/routes/me.route.js";
 
 //Middleware
@@ -27,9 +26,6 @@ app.use((req, res) => {
         <p>Sorry, ${req.url} cannot be found here</p>
     `);
 });
-
-
-
 
 // Start the server
 app.listen(PORT, () => {
