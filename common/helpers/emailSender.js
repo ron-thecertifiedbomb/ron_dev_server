@@ -29,9 +29,11 @@ export const sendEmail = async (to, subject, htmlContent) => {
 };
 
 // Function to send batch emails
-export const sendBatchEmails = async (clients, subject, createTemplate) => {
+export const sendBatchEmails = async (clients, subject, templateFn) => {
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
@@ -39,19 +41,13 @@ export const sendBatchEmails = async (clients, subject, createTemplate) => {
   });
 
   for (const client of clients) {
-    const html = createTemplate(client.name);
-
-    try {
-      await transporter.sendMail({
-        from: `"Ronan Dev" <${process.env.EMAIL_USER}>`,
-        to: client.email,
-        subject,
-        html,
-      });
-
-      console.log(`✅ Email sent to ${client.name} (${client.email})`);
-    } catch (err) {
-      console.error(`❌ Failed to send to ${client.email}:`, err.message);
-    }
+    const html = templateFn(client);
+    await transporter.sendMail({
+      user: process.env.EMAIL_USER,
+      to: client.email,
+      subject,
+      html,
+    });
+    console.log(`✅ Email sent to ${client.email}`);
   }
 };
