@@ -2,6 +2,7 @@
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 dotenv.config();
+
 // Configure your SMTP transporter
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
