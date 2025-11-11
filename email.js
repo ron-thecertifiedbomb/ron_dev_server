@@ -1,7 +1,7 @@
 // index.js
-import dotenv from "dotenv";
-import { sendBatchEmails } from './common/helpers/emailSender.js';
-dotenv.config();
+
+import { sendBatchEmails } from "./common/helpers/emailSender.js";
+
 // List of clients (small strategic batch)
 const clients = [
   { name: "Ronan Sibunga ", email: "ronan.sibunga@gmail.com" },
@@ -9,15 +9,14 @@ const clients = [
 ];
 
 // Email template
-const template = `
-  <h1>Hello {{name}},</h1>
+const createTemplate = (name) => `
+  <h1>Hello ${name}</h1>
   <p>We’re excited to share our latest web and mobile solutions with you.</p>
   <p>Visit our website to see what we can do for your business!</p>
 `;
-
 const subject = "Ronan Dev: Solutions Tailored for You";
 
 // Send the emails
-sendBatchEmails(clients, subject, template)
+sendBatchEmails(clients, subject, createTemplate)
   .then(() => console.log("All emails sent!"))
   .catch((err) => console.error(err));
