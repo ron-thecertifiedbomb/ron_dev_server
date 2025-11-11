@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
-import Me from "../models/me.schema.js";
+import Services from "../models/services.schema.js";
 
-
-export const seedDatabase = async ( data, database ) => {
+export const seedDatabase = async (data, database) => {
   const URI = process.env.MONGO_URI;
 
   try {
@@ -11,14 +10,13 @@ export const seedDatabase = async ( data, database ) => {
       serverApi: { version: "1", strict: true, deprecationErrors: true },
       serverSelectionTimeoutMS: 5000,
     });
-   console.log("databse", database);
-    console.log("✅ Connected to MongoDB");
-   
-if (!data) return
-    // Insert products
-    await Me.insertMany(data);
-    console.log(`🌱 Inserted  profiles data successfully`);
 
+    console.log("✅ seedDatabase connected to MongoDB");
+
+    if (!data) return;
+
+    await Services.insertMany(data);
+    console.log(`🌱 Seeded data successfully`);
     await mongoose.disconnect();
     process.exit(0);
   } catch (err) {
