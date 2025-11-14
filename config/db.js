@@ -7,11 +7,13 @@ const URI = process.env.MONGO_URI ;
 
 const connectDB = async () => {
 
-  if (!URI)  (console.log('No valid uri'))
-
+  if (!URI) {
+    console.error("❌ No valid MongoDB URI in environment variables");
+    process.exit(1);
+  }
   try {
     await mongoose.connect(URI, {
-      dbName: "storage", // optional — can also be embedded in URI
+      dbName: "storage", 
       serverApi: {
         version: "1",
         strict: true,

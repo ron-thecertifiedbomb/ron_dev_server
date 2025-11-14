@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import productsRoute from "./rest/routes/products.route.js";
 import meRoute from "./rest/routes/me.route.js";
-
+import blogRoute from "./rest/routes/blog.route.js";
 //Middleware
 const app = express();
 app.use(cors());
@@ -19,6 +19,7 @@ connectDB();
 app.use("/me", meRoute);
 app.use("/api/products", productsRoute);
 app.use("/", profile);
+app.use("/api/blogs", blogRoute);
 
 app.use((req, res) => {
   res.status(404).send(`
