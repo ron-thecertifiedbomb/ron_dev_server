@@ -9,30 +9,33 @@ export const saveBlogController = async (req, res) => {
   try {
     const { title, content, useGenerator, topic } = req.body;
 
-
     let finalContent = content || [];
     let finalTitle = title;
 
+    // 🔥 Auto-generate blog using AI
     if (useGenerator) {
       if (!topic) {
         return res
           .status(400)
           .json({ error: "Topic is required for generated content" });
       }
-      const generated = generateBlog(topic);
-      finalContent = generated.content; 
-      finalTitle = generated.title; 
+
+      // ❗ Fix: Await the generator
+      const generated = await generateBlog(topic);
+
+      finalContent = generated.content;
+      finalTitle = generated.title;
     }
 
     if (!finalTitle) {
       return res.status(400).json({ error: "Title is required" });
     }
 
-    // Save blog to database
+    // 🔥 FULL TipTap JSON content is saved
     const blog = await Blog.create({
       title: finalTitle,
-      content: finalContent,
-      createdBy: req.user?.id || null, // optional
+      content: finalContent, // IMPORTANT: store full JSON blocks
+      createdBy: req.user?.id || null,
     });
 
     return res.status(201).json(blog);
@@ -41,8 +44,6 @@ export const saveBlogController = async (req, res) => {
     return res.status(500).json({ error: "Failed to save blog" });
   }
 };
-
-
 
 export const getBlogsController = async (req, res) => {
   try {
@@ -54,10 +55,14 @@ export const getBlogsController = async (req, res) => {
   }
 };
 
-
 export const getBlogByIdController = async (req, res) => {
   try {
     const blog = await getBlogById(req.params.id);
+
+    if (!blog) {
+      return res.status(404).json({ error: "Blog not found" });
+    }
+
     res.status(200).json(blog);
   } catch (err) {
     console.error("Fetch blog by ID error:", err.message);
