@@ -1,4 +1,5 @@
 import { spawn } from "child_process";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import ffmpegPath from "ffmpeg-static";
@@ -6,6 +7,10 @@ import { sendProgress } from "../services/youtubeProgress.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Ensure downloads folder exists
+const outputDir = path.join(__dirname, "downloads");
+if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
 // Dynamically pick yt-dlp binary based on platform
 const ytDlpPath =
@@ -15,14 +20,8 @@ const ytDlpPath =
 
 export function downloadAudio(url) {
   return new Promise((resolve, reject) => {
-    // Output template for yt-dlp
-    const outputTemplate = path.join(
-      __dirname,
-      "downloads",
-      "audio_%(title)s.%(ext)s"
-    );
+    const outputTemplate = path.join(outputDir, "audio_%(title)s.%(ext)s");
 
-    // Spawn yt-dlp process
     const ytdlp = spawn(ytDlpPath, [
       "-f",
       "bestaudio",
@@ -41,13 +40,12 @@ export function downloadAudio(url) {
 
     let mp3FileName = "";
 
-    // Capture download progress
     ytdlp.stdout.on("data", (data) => {
       const str = data.toString();
       const match = str.match(/\[download\]\s+(\d{1,3}\.\d)%/);
       if (match) {
         const percent = parseFloat(match[1]);
-        sendProgress(percent, mp3FileName);
+        sendProgress(percent, mp3FileName || "audio");
       }
     });
 
@@ -59,17 +57,15 @@ export function downloadAudio(url) {
         return reject(new Error(`yt-dlp exited with code ${code}`));
 
       try {
-        // Find the downloaded MP3
-        const files = fs.readdirSync(path.join(__dirname, "downloads"));
+        const files = fs.readdirSync(outputDir);
         const mp3File = files.find(
           (f) => f.endsWith(".mp3") && f.startsWith("audio_")
         );
         if (!mp3File) return reject(new Error("MP3 file not found"));
 
         mp3FileName = mp3File;
-        const fullPath = path.join(__dirname, "downloads", mp3File);
+        const fullPath = path.join(outputDir, mp3File);
 
-        // Extract title
         const matchTitle = mp3File.match(/^audio_(.+)\.mp3$/);
         const title = matchTitle ? matchTitle[1] : "audio";
 
