@@ -12,19 +12,14 @@ const __dirname = path.dirname(__filename);
 const outputDir = path.join(__dirname, "downloads");
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
-// Dynamically pick yt-dlp binary based on platform
-const ytDlpPath =
-  process.platform === "win32"
-    ? path.join(__dirname, "tools", "yt-dlp_x86.exe") // Windows
-    : path.join(__dirname, "tools", "yt-dlp"); // Linux / Render
-
-// Path to optional cookies file (for age-restricted videos)
+// Optional cookies file (for age-restricted videos)
 const cookiesPath = path.join(__dirname, "tools", "cookies.txt");
 
 export function downloadAudio(url) {
   return new Promise((resolve, reject) => {
     const outputTemplate = path.join(outputDir, "audio_%(title)s.%(ext)s");
 
+    // Build arguments for yt-dlp (Python version)
     const args = [
       "-f",
       "bestaudio",
@@ -43,18 +38,21 @@ export function downloadAudio(url) {
       url,
     ];
 
-    // If cookies file exists, add it for authentication
+    // Add cookies if available
     if (fs.existsSync(cookiesPath)) {
-      args.splice(6, 0, "--cookies", cookiesPath);
+      args.push("--cookies", cookiesPath);
     }
 
-    const ytdlp = spawn(ytDlpPath, args);
+    // Spawn yt-dlp via Python to ensure it works on Linux/Render
+    const ytdlp = spawn("python3", ["-m", "yt_dlp", ...args]);
 
     let mp3FileName = "";
+    let downloadLog = "";
 
     // Track download progress
     ytdlp.stdout.on("data", (data) => {
       const str = data.toString();
+      downloadLog += str;
       const match = str.match(/\[download\]\s+(\d{1,3}\.\d)%/);
       if (match) {
         const percent = parseFloat(match[1]);
@@ -62,14 +60,26 @@ export function downloadAudio(url) {
       }
     });
 
-    ytdlp.stderr.on("data", (data) => console.error(data.toString()));
-    ytdlp.on("error", reject);
+    ytdlp.stderr.on("data", (data) => {
+      const str = data.toString();
+      downloadLog += str;
+      console.error(str);
+    });
+
+    ytdlp.on("error", (err) => {
+      console.error("yt-dlp spawn error:", err);
+      reject(err);
+    });
 
     ytdlp.on("close", (code) => {
-      if (code !== 0)
-        return reject(new Error(`yt-dlp exited with code ${code}`));
+      if (code !== 0) {
+        return reject(
+          new Error(`yt-dlp exited with code ${code}\n${downloadLog}`)
+        );
+      }
 
       try {
+        // Find downloaded MP3
         const files = fs.readdirSync(outputDir);
         const mp3File = files.find(
           (f) => f.endsWith(".mp3") && f.startsWith("audio_")
@@ -82,6 +92,7 @@ export function downloadAudio(url) {
         const matchTitle = mp3File.match(/^audio_(.+)\.mp3$/);
         const title = matchTitle ? matchTitle[1] : "audio";
 
+        // Ensure progress reaches 100%
         sendProgress(100, title);
 
         resolve({ filePath: fullPath, title });
