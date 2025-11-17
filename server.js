@@ -5,6 +5,7 @@ import connectDB from "./config/db.js";
 import productsRoute from "./rest/routes/products.route.js";
 import meRoute from "./rest/routes/me.route.js";
 import blogRoute from "./rest/routes/blog.route.js";
+import youtubeRoutes from "./rest/routes/youtubeRoutes.js";
 //Middleware
 const app = express();
 app.use(cors());
@@ -21,6 +22,7 @@ app.use("/api/products", productsRoute);
 app.use("/", profile);
 app.use("/api/blogs", blogRoute);
 
+app.use("/api/youtube-to-mp3", youtubeRoutes);
 app.use((req, res) => {
   res.status(404).send(`
         <h2>Uh Oh!</h2>
