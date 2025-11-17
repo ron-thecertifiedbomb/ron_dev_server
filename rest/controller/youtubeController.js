@@ -1,5 +1,4 @@
 import fs from "fs";
-import path from "path";
 import { downloadAudio } from "../../common/services/youtubeAudioConverter.js";
 
 export const downloadAudioController = async (req, res) => {
@@ -10,7 +9,7 @@ export const downloadAudioController = async (req, res) => {
   }
 
   try {
-    const filePath = await downloadAudio(url); // wait for MP3
+    const { filePath, title } = await downloadAudio(url); // destructure
 
     const stat = fs.statSync(filePath);
 
@@ -19,7 +18,7 @@ export const downloadAudioController = async (req, res) => {
     res.setHeader("Content-Length", stat.size);
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${path.basename(filePath)}"`
+      `attachment; filename="${title}.mp3"` // use title from object
     );
 
     const fileStream = fs.createReadStream(filePath);
