@@ -7,8 +7,7 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start-server": "node server.js",
-    "start-email": "node email.js",
-    "postinstall": "chmod +x common/services/tools/yt-dlp"
+    "start-email": "node email.js"
   },
   "keywords": [
     "crud",
