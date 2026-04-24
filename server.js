@@ -7,6 +7,7 @@ import meRoute from "./rest/routes/me.route.js";
 import blogRoute from "./rest/routes/blog.route.js";
 import youtubeRoutes from "./rest/routes/youtubeRoutes.js";
 import youtubeProgressRoutes from "./rest/routes/youtubeProgressRoute.js";
+import examRoute from "./rest/routes/exam.route.js";
 //Middleware
 const app = express();
 app.use(cors());
@@ -22,6 +23,7 @@ app.use("/me", meRoute);
 app.use("/api/products", productsRoute);
 app.use("/", profile);
 app.use("/api/blogs", blogRoute);
+app.use("/api/exams", examRoute);
 app.use("/api/youtube-to-mp3", youtubeProgressRoutes);
 app.use("/api/youtube-to-mp3", youtubeRoutes);
 app.use((req, res) => {
